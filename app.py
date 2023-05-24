@@ -56,7 +56,13 @@ with st.sidebar:
                             'Prever evasão'],
                            icons = ['activity'],
                            default_index=0)
+    st.text('Github Account:')
+    st.markdown('<a href="https://github.com/math3usvalenca" style="text-decoration:none;background:green;padding:5px;color:white;border-radius:3px">Matheus Valença</a>', unsafe_allow_html=True)
     
+    st.text('Project repositories:')
+    st.markdown('<a href="https://github.com/math3usvalenca/machine-learning-no-combate-a-evasao-estudantil" style="text-decoration:none;background:#4287f5;padding:5px;color:white;border-radius:3px">EDA/ML</a>', unsafe_allow_html=True)
+    st.markdown('<a href="https://github.com/math3usvalenca/data-visualization-and-prediction-of-student-dropout" style="text-decoration:none;background:#4287f5;padding:5px;color:white;border-radius:3px">Sreamlit</a>', unsafe_allow_html=True)
+  
     
 # student dropout visualizations
 if(selected=='Visualização de dados'):
@@ -231,7 +237,10 @@ if(selected=='Visualização de dados'):
     # indo
     st.info('Mas vale ressaltar que dado o baixo valor de R² essas tendências acimas observadas para carga horária e fator de esforço não são muito confiáveis.')
     
- 
+    st.text('Para ver todos os insights retirados acesse o link abaixo:')
+    
+    link = '[Notebook](https://nbviewer.org/github/math3usvalenca/machine-learning-no-combate-a-evasao-estudantil/blob/main/analise-de-dados-estudantis/AED.ipynb)'
+    st.markdown(link, unsafe_allow_html=True)
     
 if(selected=='Prever evasão'):
     # page title
@@ -361,4 +370,12 @@ if(selected=='Prever evasão'):
         else:
             st.success(f'Apenas {round(prediction[0]*100)} % de chances de evasão')
 
-     
+    st.info('O modelo que está sendo utilizado é a regressão logística. Esse modelo tem um Recall de 0.89 para classes positivas. Em outras palavras, se o estudante informado for realmente um potencial evadido existem 89 por cento de chances do modelo o classificar corretamente como evadido.')
+    
+    st.text('Métricas do modelo')
+    
+    metrics = {'Precision': [0.84], 'Recall': [0.89],'Accuracy':[0.80]}
+        
+    df_metrics = pd.DataFrame(data=metrics)
+    
+    st.table(df_metrics)
