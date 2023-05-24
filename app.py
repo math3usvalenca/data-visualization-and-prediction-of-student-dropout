@@ -231,5 +231,134 @@ if(selected=='Visualização de dados'):
     # indo
     st.info('Mas vale ressaltar que dado o baixo valor de R² essas tendências acimas observadas para carga horária e fator de esforço não são muito confiáveis.')
     
+ 
     
+if(selected=='Prever evasão'):
+    # page title
+    st.title('Prevendo evasão')
     
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+       nome_curso = st.selectbox('Nome do curso',
+                                 ('analise e desenvolvimento de sistemas','administracao','agroecologia','alimentos','automacao industrial',
+                                  'ciencias biologicas','construcao de edificios','design de interiores','design grafico','educacao fisica',
+                                  'engenharia de controle e automacao','engenharia mecanica','engenharia de computacao','engenharia civil','engenharia eletronica',
+                                  'fisica','geoprocessamento','gestao ambiental','gestao comercial','matematica','medicina veterinaria','negocios imobiliarios',
+                                  'quimica','redes de computadores','sistemas para internet','seguranca no trabalho',
+                                  'sistemas de telecomunicacoes','telematica')
+                                 )
+        
+    with col2:
+        carga_horaria = st.number_input('Carga horária')
+        
+    with col3:
+        eixo_tec = st.selectbox('Eixo tecnológico',
+                                ('infraestrutura',
+                                 'gestao e negocios',
+                                 'recursos naturais',
+                                 'producao alimenticia',
+                                 'desenvolvimento educacional e social',
+                                 'informacao e comunicacao',
+                                 'producao cultural e design',
+                                 'ambiente e saude',
+                                 'seguranca',
+                                 'controle e processos industriais'))
+        
+    with col1:
+        fator_esforco = st.number_input('Fator esforço')
+        
+    with col2:
+        tipo_curso = st.selectbox('Tipo de curso',
+                                  ('tecnologia',
+                                   'bacharelado',
+                                    'licenciatura'))
+        
+    with col3:
+        turno = st.selectbox('Turno',
+                             ('integral','noturno','matutino',
+                              'vespertino')
+                             )
+        
+    import datetime
+    
+    with col1:
+        inicio_curso = st.date_input('Inicio do curso',
+                                     datetime.date(2023,1,1))
+        
+    with col2:
+        final_esperado = st.date_input('Final esperado',
+                                     datetime.date(2023,1,1))    
+    
+    with col3:
+        renda = st.selectbox('Renda',
+                             ('0<RFP<=0,5',
+                              '0,5<RFP<=1',
+                              '1,0<RFP<=1,5',
+                              '1,5<RFP<=2,5',
+                            '2,5<RFP<=3,5',
+                            'RFP>3,5'))
+    with col1:
+        sexo = st.selectbox('Sexo',
+                            ('M','F'))
+        
+    with col2:
+        faixa_etaria = st.selectbox('Faixa etária',
+                                    ('15-19','20-24',
+                                    '25-29','30-34',
+                                    '35-39','40-44',
+                                    '45-49','50-54',
+                                    '55-59'))
+        
+    with col3:
+        cor = st.selectbox('Cor',
+                           ('branca','parda','preta',
+                            'amarela','indigena')) 
+    
+    # prevendo
+    if st.button('Prever'):
+      
+        # conversão de variáveis
+        inicio_curso =  inicio_curso.strftime("%d/%m/%Y")  
+        final_esperado =  final_esperado.strftime("%d/%m/%Y")
+        
+        carga_horaria = int(carga_horaria)
+
+        # lista de colunas
+        list_cols = ['nome_curso','carga_horaria','eixo_tec','fator_esforco','tipo_curso','turno','inicio_curso','final_esperado',
+                     'renda','sexo','faixa_etaria',
+                    'cor']
+        
+        # criando um novo DF
+        d = {'nome_curso': [nome_curso], 'carga_horaria': [carga_horaria],'eixo_tec':[eixo_tec],'fator_esforco':[fator_esforco],
+             'tipo_curso':[tipo_curso],'turno':[turno],'inicio_curso':[inicio_curso],'final_esperado':[final_esperado],
+             'renda':[renda],'sexo':[sexo],'faixa_etaria':[faixa_etaria],'cor':[cor]}
+        
+        new_student = pd.DataFrame(data=d)
+        
+        # guardando variávies categóricas                
+        X_cat = new_student[['nome_curso','eixo_tec','tipo_curso','turno','inicio_curso','final_esperado','renda','sexo','faixa_etaria','cor']]
+        # codificando variáveis categóricas com OneHotEnconding
+        X_encoded = one_hot.transform(X_cat).toarray()
+        X_encoded = pd.DataFrame(X_encoded) # transformando em DataFrame
+        X_encoded.columns = one_hot.get_feature_names_out() # renomeando as colunas
+        
+        # guardando variávides numéricas 
+        X_numerical = new_student[['carga_horaria','fator_esforco']]
+        # concatenando os DFs
+        X_all = pd.concat([X_encoded, X_numerical],axis=1)
+        # escalonando o X_all cin MinMax
+        X_scaled = min_max.transform(X_all)
+        
+        # chamando a função para realizar a previsão
+        prediction = dropout_prediction(X_scaled)
+        
+        st.text('Aluno informado:')
+        st.write(new_student)
+        # exibindo resultados
+        if(prediction > 0.5):
+            st.warning(f'{round(prediction[0]*100)} % de chances de evasão')
+        else:
+            st.success(f'Apenas {round(prediction[0]*100)} % de chances de evasão')
+
+     
