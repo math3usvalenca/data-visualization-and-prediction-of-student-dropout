@@ -1,7 +1,7 @@
 # data-visualization-and-prediction-of-student-dropout
 
 
-Este projeto tem como objetivo analisar e prever a evasão estudantil nos Institutos Federais de Ciência e Tecnologia da Paraíba, utilizando dados que incluem informações sobre cursos, tipos de curso, eixo tecnológico e características socioeconômicas dos estudantes.
+Este projeto tem como objetivo analisar e prever a evasão estudantil em cursos superiores no Instituto Federal de Ciência e Tecnologia da Paraíba, utilizando dados que incluem informações sobre cursos, tipos de curso, eixo tecnológico e características socioeconômicas dos estudantes.
 
 Principais recursos:
 
@@ -38,7 +38,7 @@ Execute a aplicação: Depois de clonar o repositório e instalar as dependênci
 
 ### Screenshots
 
-<img src="https://res.cloudinary.com/dxwvax3zv/image/upload/v1684965105/streamlit_yenuqi.png"/>
+<img src="https://res.cloudinary.com/dxwvax3zv/image/upload/v1691704560/Captura_de_tela_de_2023-08-10_18-54-43.png"/>
 
-<img src="https://res.cloudinary.com/dxwvax3zv/image/upload/v1684965105/streamlit2_fwlb7i.png"/>
+<img src="https://res.cloudinary.com/dxwvax3zv/image/upload/v1691704560/Captura_de_tela_de_2023-08-10_18-55-29.png"/>
 
