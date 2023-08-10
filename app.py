@@ -26,8 +26,8 @@ def dropout_prediction(input_data):
 # carregando csv
 @st.cache_data
 def get_data(): 
-     return pd.read_csv(os.path.join(os.getcwd(),'student_data.csv'),
-                        usecols = lambda column:column not in ['cod_curso','codigo_da_matricula','codigo_do_ciclo_matricula'])
+     return pd.read_csv(os.path.join(os.getcwd(),'data.csv'),
+                        usecols = lambda column:column not in ['cod_curso','codigo_da_matricula','codigo_do_ciclo_matricula','vagas_ofertadas'])
 
 df = get_data()
 
@@ -47,12 +47,12 @@ concluintes_df = get_concluintes()
 
 @st.cache_data
 def get_evadidos_20_29():
-   evadidos_20_29 = evadidos_df.query('faixa_etaria=="20-24" | faixa_etaria=="20-29"')
+   evadidos_20_29 = evadidos_df.query('faixa_etaria=="20-24" | faixa_etaria=="25-29"')
    return evadidos_20_29
 
 @st.cache_data
 def get_concluintes_20_29():
-   concluintes_20_29 = concluintes_df.query('faixa_etaria=="20-24" | faixa_etaria=="20-29"')
+   concluintes_20_29 = concluintes_df.query('faixa_etaria=="20-24" | faixa_etaria=="25-29"')
    return concluintes_20_29
 
 evadidos_20_29 = get_evadidos_20_29()
@@ -62,29 +62,6 @@ df_20_29 = pd.concat([evadidos_20_29, concluintes_20_29])
 df_30_49 = df[(df['faixa_etaria']=='30-34') | (df['faixa_etaria']=='35-39') | (df['faixa_etaria']=='40-44') | (df['faixa_etaria']=='45-49')]
 ages = pd.crosstab(evadidos_df['idade'],evadidos_df['categoria_de_situacao']).reset_index()
 
-# função para barplot com porcentagem 
-# @st.cache_data
-# def show_bars(subplot_value, x_value, hue_value, dataset):
-#     plt.subplot(subplot_value)
-#     ax = sns.countplot(x = x_value, hue = hue_value, data = dataset,palette='plasma')
-#     ax.set(xlabel = x_value, ylabel = 'Quantidade')
-    
-    
-#     all_heights = [[p.get_height() for p in bars] for bars in ax.containers]
-    
-#     for bars in ax.containers:
-#         for x, p in enumerate(bars):
-#             total = sum(xgroup[x] for xgroup in all_heights) 
-#             percentage = f'{(100 * p.get_height() / total) :.1f}%'
-#             ax.annotate(f'{p.get_height()}\n{percentage}', (p.get_x() + p.get_width() / 2, p.get_height()), size=12, ha='center', va='bottom')
-   
-
-#     x_ticks = [item.get_text() for item in ax.get_xticklabels()]
-#     if len(x_ticks[0]) > 10:
-#         ax.set_xticklabels(x_ticks, rotation=45, fontsize=12)
-#     else:
-#         ax.set_xticklabels(x_ticks, fontsize=12)
- 
  
 # função para exibir gŕaficos sunburst
 @st.cache_data
@@ -143,7 +120,7 @@ if(selected=='Visualização de dados'):
     
     
     # 
-    st.subheader('Como está distribuída a evesão pelos Campus?')
+    st.subheader('Como está distribuída a evesão pelos Campi?')
     fig = plt.figure(constrained_layout=True,figsize=(15,9))
 
     gs = GridSpec(1,3, figure=fig)
@@ -172,7 +149,7 @@ if(selected=='Visualização de dados'):
     st.write(fig)
         
     
-    st.subheader('Quais Campus têm maiores percentuais de evadidos?')
+    st.subheader('Quais Campi têm maiores percentuais de evadidos?')
     
     image = Image.open('./images/image.png')
     st.image(image)
@@ -200,7 +177,7 @@ if(selected=='Visualização de dados'):
     fig.add_annotation(
         x=1250,
         y=1.93,
-        text="Dentre os evadidos, as rendas mais presentes estão entre 0<RFP<=0,5 e 0,5<RFP<=1,5",
+        text="Entre os evadidos, as rendas mais presentes estão entre 0<RFP<=0,5 e 0,5<RFP<=1,5",
         font=dict(
             size=11,
             color="white"
@@ -275,6 +252,7 @@ if(selected=='Visualização de dados'):
                   color_discrete_map={'tecnologia':'black','bacharelado':'gold','licenciatura':'blue'},labels={"count": "quantidade","labels":"curso"})
 
     fig.update_layout(title='<b>Concentração de Evadidos na faixa 20-29 por cursos e seus tipos</b>',height=670)
+    fig.update_traces(textinfo="label+value")
 
     st.write(fig)
     
@@ -304,7 +282,7 @@ if(selected=='Visualização de dados'):
     
     fig = px.scatter(df, x="carga_horaria_do_curso", y="E",size='E', color='E',trendline="ols")
     fig.update_layout(title='<b>Evasão x Carga Horária</b>',  yaxis_title="Qtde. Evadidos", )
-   
+    fig.update_coloraxes(showscale=False)
     st.write(fig)
     st.info('Não há uma correlação significativa entre a carga horária e a evasão')
     
@@ -312,7 +290,7 @@ if(selected=='Visualização de dados'):
     # ages = pd.crosstab(evadidos_df['idade'],evadidos_df['categoria_de_situacao']).reset_index()
     fig = px.scatter(ages, x="idade", y="E",size='E', color='E',trendline="ols",width=900)
     fig.update_layout(title='<b>Evasão x Idade</b>',  yaxis_title="Qtde. Evadidos", )
-
+    fig.update_coloraxes(showscale=False)
     fig.add_annotation(
         x=49,
         y=300,
@@ -341,12 +319,7 @@ if(selected=='Prever evasão'):
     
     with col1:
        nome_curso = st.selectbox('Nome do curso',
-                                 ('analise e desenvolvimento de sistemas','administracao','agroecologia','alimentos','automacao industrial',
-                                  'ciencias biologicas','construcao de edificios','design de interiores','design grafico','educacao fisica',
-                                  'engenharia de controle e automacao','engenharia mecanica','engenharia de computacao','engenharia civil','engenharia eletronica',
-                                  'fisica','geoprocessamento','gestao ambiental','gestao comercial','matematica','medicina veterinaria','negocios imobiliarios',
-                                  'quimica','redes de computadores','sistemas para internet','seguranca no trabalho',
-                                  'sistemas de telecomunicacoes','telematica','letras - lingua portuguesa','design de interiores')
+                                    tuple(df['nome_do_curso'].unique())
                                  )
         
     with col2:
@@ -354,16 +327,8 @@ if(selected=='Prever evasão'):
         
     with col3:
         eixo_tec = st.selectbox('Eixo tecnológico',
-                                ('infraestrutura',
-                                 'gestao e negocios',
-                                 'recursos naturais',
-                                 'producao alimenticia',
-                                 'desenvolvimento educacional e social',
-                                 'informacao e comunicacao',
-                                 'producao cultural e design',
-                                 'ambiente e saude',
-                                 'seguranca',
-                                 'controle e processos industriais'))
+                                tuple(df['eixo_tecnologico'].unique())
+                               )
       
     with col1:
         idade = st.number_input('Idade') 
@@ -371,10 +336,8 @@ if(selected=='Prever evasão'):
      
     with col2:
         unidade_ensino = st.selectbox('Unidade de ensino',
-                                  ('Campus João Pessoa',
-                                   'Campus Cajazeiras',
-                                    'Campus Picuí','Campus Campina Grande','Campus Sousa','Campus Monteiro',
-                                    'Campus Patos','Campus Guarabira','Campus Cabedelo','Campus Princesa Isabel'))
+                                        tuple(df['unidade_de_ensino'].unique())
+                                    )
         
      
     with col3:
@@ -406,49 +369,43 @@ if(selected=='Prever evasão'):
     
     with col3:
         renda = st.selectbox('Renda',
-                             ('0<RFP<=0,5',
-                              '0,5<RFP<=1',
-                              '1,0<RFP<=1,5',
-                              '1,5<RFP<=2,5',
-                            '2,5<RFP<=3,5',
-                            'RFP>3,5'))
+                                tuple(df['renda'].unique())
+                            )
     with col1:
         sexo = st.selectbox('Sexo',
                             ('M','F'))
         
     with col2:
         faixa_etaria = st.selectbox('Faixa etária',
-                                    ('15-19','20-24',
-                                    '25-29','30-34',
-                                    '35-39','40-44',
-                                    '45-49','50-54',
-                                    '55-59'))
+                                        tuple(df['faixa_etaria'].unique())
+                                    )
         
     with col3:
         cor = st.selectbox('Cor',
-                           ('branca','parda','preta',
-                            'amarela','indigena')) 
+                                tuple(df['cor'].unique())
+                            ) 
     
     # prevendo
     if st.button('Prever'):
       
         # conversão de variáveis
-        inicio_curso =  inicio_curso.strftime("%d/%m/%Y")  
-        final_esperado =  final_esperado.strftime("%d/%m/%Y")
-        mes_ocorrencia =  mes_ocorrencia.strftime("%d/%m/%Y")
-        carga_horaria = int(carga_horaria)
+        #inicio_curso =  inicio_curso.strftime("%d/%m/%Y")  
+       # final_esperado =  final_esperado.strftime("%d/%m/%Y")
+        mes_ocorrencia =  pd.to_datetime(mes_ocorrencia)
+        inicio_curso =  pd.to_datetime(inicio_curso)  
+        final_esperado =  pd.to_datetime(final_esperado)
 
-        # lista de colunas
-        # list_cols = ['nome_do_curso','carga_horaria_do_curso','eixo_tecnologico',
-        #              'fator_de_esforco_de_curso','tipo_de_curso','turno','data_de_inicio_do_ciclo','data_de_fim_previsto_do_ciclo',
-        #              'renda','sexo','faixa_etaria','mes_de_ocorrencia_da_situcao','idade',
-        #             'cor']
+        delta_days = (final_esperado - inicio_curso).days
+        delta_days_ocorrencia = (mes_ocorrencia - inicio_curso).days
+
+
+        carga_horaria = int(carga_horaria)
         
         # criando um novo DF
         d = {'nome_do_curso': [nome_curso], 'carga_horaria_do_curso': [carga_horaria],'eixo_tecnologico':[eixo_tec],
              'fator_de_esforco_de_curso':[fator_esforco],'tipo_de_curso':[tipo_curso],'turno':[turno],
-            'data_de_inicio_do_ciclo':[inicio_curso],'data_de_fim_previsto_do_ciclo':[final_esperado],
-             'renda':[renda],'sexo':[sexo],'idade':[idade], 'unidade_de_ensino':[unidade_ensino], 'mes_de_ocorrencia_da_situacao':[mes_ocorrencia],
+            'delta_days':[delta_days], 'delta_days_ocorrencia':[delta_days_ocorrencia],
+             'renda':[renda],'sexo':[sexo],'idade':[idade], 'unidade_de_ensino':[unidade_ensino],
              'faixa_etaria':[faixa_etaria],'cor':[cor],
              }
         
@@ -456,8 +413,8 @@ if(selected=='Prever evasão'):
         
         # guardando variávies categóricas                
         X_cat = new_student[['nome_do_curso','eixo_tecnologico',
-           'tipo_de_curso','turno','data_de_inicio_do_ciclo','data_de_fim_previsto_do_ciclo','renda','sexo','faixa_etaria','cor',
-           'unidade_de_ensino','mes_de_ocorrencia_da_situacao']]
+           'tipo_de_curso','turno','renda','sexo','faixa_etaria','cor',
+           'unidade_de_ensino']]
         
         # codificando variáveis categóricas com OneHotEnconding
         X_encoded = one_hot.transform(X_cat).toarray()
@@ -465,7 +422,8 @@ if(selected=='Prever evasão'):
         X_encoded.columns = one_hot.get_feature_names_out() # renomeando as colunas
         
         # guardando variávides numéricas 
-        X_numerical = new_student[['carga_horaria_do_curso','fator_de_esforco_de_curso','idade']]
+        X_numerical = new_student[['carga_horaria_do_curso','fator_de_esforco_de_curso','idade',
+                    'delta_days','delta_days_ocorrencia']]
         # concatenando os DFs
         X_all = pd.concat([X_encoded, X_numerical],axis=1)
         # escalonando o X_all com MinMax
@@ -482,11 +440,11 @@ if(selected=='Prever evasão'):
         else:
             st.success(f'Apenas {round(prediction[0]*100)} % de chances de ser da classe Evadido')
 
-    st.info('O modelo que está sendo utilizado é a Regressão Logística. Esse modelo tem um Recall de 0.90 para classes positivas. Em outras palavras, se o estudante informado for realmente um potencial evadido existem 90 por cento de chances do modelo o classificar corretamente como evadido.')
+    st.info('O modelo que está sendo utilizado é a Regressão Logística. Esse modelo tem um Recall de 0.92 para classes positivas. Em outras palavras, se o estudante informado for realmente um potencial evadido existem 92%'+' de chances do modelo o classificar como tal.')
     
-    st.text('Métricas do modelo')
+    st.text('Métricas do modelo:')
     
-    metrics = {'Precision': [0.86], 'Recall': [0.90],'Accuracy':[0.81]}
+    metrics = {'Precision': [0.80], 'Recall': [0.92],'Accuracy':[0.77]}
         
     df_metrics = pd.DataFrame(data=metrics)
     
