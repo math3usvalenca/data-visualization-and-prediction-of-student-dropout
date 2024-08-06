@@ -116,7 +116,7 @@ if(selected=='Visualização de dados'):
    # title="<b>Evadido x Concluinte</b>"
     #)
   
-    st.write(fig)
+    #st.write(fig)
     
     
     # 
