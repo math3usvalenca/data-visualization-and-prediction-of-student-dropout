@@ -107,14 +107,14 @@ if(selected=='Visualização de dados'):
     st.subheader('Base de dados')
     st.write(df.head())
     
-    st.subheader('Proporção de evadidos e concluintes na base de dados')
+    #st.subheader('Proporção de evadidos e concluintes na base de dados')
     
-    situacao_counts = df['categoria_de_situacao'].value_counts().reset_index(name='quantidade')
-    labels = ['Evadido', 'Concluinte']
-    fig = px.pie(situacao_counts, values='quantidade', names='index',width=420,height=420)
-    fig.update_layout(
-    title="<b>Evadido x Concluinte</b>"
-    )
+    #situacao_counts = df['categoria_de_situacao'].value_counts().reset_index(name='quantidade')
+    #labels = ['Evadido', 'Concluinte']
+    #fig = px.pie(situacao_counts, values='quantidade', names='index',width=420,height=420)
+    #fig.update_layout(
+   # title="<b>Evadido x Concluinte</b>"
+    #)
   
     st.write(fig)
     
