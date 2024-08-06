@@ -4,5 +4,5 @@ matplotlib
 seaborn
 streamlit
 statsmodels
-scikit-learn
+scikit-learn==1.2.1
 streamlit_option_menu
