@@ -3,6 +3,7 @@ plotly
 matplotlib
 seaborn
 streamlit==1.22.*
+numpy==1.26.4
 statsmodels
 scikit-learn==1.2.1
 streamlit_option_menu
